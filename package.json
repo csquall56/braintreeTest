@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "mocha"
   },
   "dependencies": {
     "braintree": "^3.1.0",
@@ -12,6 +13,7 @@
     "express": "^4.16.4",
     "hbs": "~4.0.4",
     "http-errors": "~1.6.3",
+    "mock-braintree": "^1.4.4",
     "morgan": "~1.9.1"
   },
   "engines": {
@@ -19,7 +21,12 @@
   },
   "description": "test",
   "main": "app.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "request": "^2.88.2",
+    "supertest": "^6.0.1"
+  },
   "author": "",
   "license": "ISC"
 }

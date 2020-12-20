@@ -4,9 +4,31 @@
 <div id="dropin-wrapper">
   <div id="checkout-message"></div>
   <div id="dropin-container"></div>
-  <button id="submit-button">Submit payment</button>
+  <button id="submit-button">Submit payment</button><br><br>
+  <hr>
+  <p>Credit Card Verification Client Test</p>
+  <select id="nonce" name="Nonce">
+  <option value="fake-valid-nonce">Fake Valid Nonce</option>
+  <option value="fake-processor-declined-visa-nonce">Fake Declined Visa nonce</option>
+</select> <br><br>
+   <input type="button" id="submit" value="Submit"><br>
 </div>
 <script>
+//
+
+$(document).ready(function(){
+       var user,pass;
+       $("#submit").click(function(){
+         nonce=$("#nonce").val();
+         $.post("/checkout/paymentMethod",{nonce: nonce}, function(data){
+           console.log(data);
+           alert(data);
+            // if(data === 'Processor Declined') {
+            //     alert("Processor Declined");
+            //   }
+         });
+       });
+     });
   var button = document.querySelector('#submit-button');
 
   braintree.dropin.create({
@@ -15,14 +37,29 @@
     container: '#dropin-container'
   }, function (createErr, instance) {
     button.addEventListener('click', function () {
+
+      // $.ajax({
+      //   type: 'POST',
+      //   url: '/checkout/payment',
+      //   data: {'paymentMethodNonce': payload.nonce}
+      // }).done(function(result) {
+      //   console.log('result is');
+      //   console.log(result);
+      //
       instance.requestPaymentMethod(function (requestPaymentMethodErr, payload) {
         // When the user clicks on the 'Submit payment' button this code will send the
         // encrypted payment information in a variable called a payment method nonce
+        // console.log('payload');
+        // console.log(payload);
+        // console.log(payload.nonce);
+        //data: {'paymentMethodNonce': 'fake-processor-declined-visa-nonce'}
         $.ajax({
           type: 'POST',
           url: '/checkout',
           data: {'paymentMethodNonce': payload.nonce}
         }).done(function(result) {
+          console.log('result is');
+          console.log(result);
           // Tear down the Drop-in UI
           instance.teardown(function (teardownErr) {
             if (teardownErr) {
@@ -35,10 +72,14 @@
           });
 
           if (result.success) {
-            $('#checkout-message').html('<h1>Success</h1><p>Your Drop-in UI is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p>');
+            $('#checkout-message').html('<h1>Success</h1><p>Your transaction has been approved.</p>');
           } else {
             console.log(result);
-            $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+        //    $('#checkout-message').html('<h1>Error</h1>''<p>{{result.message}}</p>');
+            $('#checkout-message').html(function(){
+              return '<h1>Error</h1><p>Error Message: ' + result.message + '. Your transaction is denied. Please verify your credit card details</p>';
+            });
+
           }
         });
       });
